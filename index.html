@@ -1,222 +1,1210 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jadwal Materi Writing</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruang PTE — Invoice Studio</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root { --accent: #0d9488; }
+  * { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+  body {
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(13,148,136,0.10), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 100% 100%, rgba(245,158,11,0.06), transparent 60%),
+      #f1f5f9;
+    min-height: 100vh;
+  }
+  .editor-scroll::-webkit-scrollbar { width: 6px; }
+  .editor-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  .editor-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  .preview-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+  .preview-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+  .section-card { background: white; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; }
+  .section-header { padding: 14px 16px; cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: space-between; background: white; transition: background .15s; }
+  .section-header:hover { background: #f8fafc; }
+  .section-content { padding: 0 16px 16px; }
+  .section-collapsed .section-content { display: none; }
+  .chevron { transition: transform .2s; }
+  .section-collapsed .chevron { transform: rotate(-90deg); }
+
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 9px 12px; background: #f8fafc;
+    border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px;
+    color: #1e293b; transition: all .15s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none; border-color: var(--accent); background: white;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+  .form-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; display: block; }
+
+  .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 0 0 1px rgba(0,0,0,0.1); transition: transform .15s; }
+  .color-swatch:hover { transform: scale(1.12); }
+  .color-swatch.active { box-shadow: 0 0 0 2px var(--accent), 0 0 0 4px white, 0 0 0 5px var(--accent); }
+
+  .logo-dropzone { border: 2px dashed #cbd5e1; border-radius: 10px; padding: 18px; text-align: center; cursor: pointer; transition: all .2s; background: #f8fafc; }
+  .logo-dropzone:hover, .logo-dropzone.drag-over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, white); }
+
+  .toggle { position: relative; width: 38px; height: 22px; background: #cbd5e1; border-radius: 9999px; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+  .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .toggle.active { background: var(--accent); }
+  .toggle.active::after { transform: translateX(16px); }
+
+  .tab-btn { padding: 7px 14px; border-radius: 8px; font-weight: 600; color: #64748b; transition: all .15s; cursor: pointer; font-size: 13px; }
+  .tab-btn.active { background: white; color: #0f172a; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .tab-btn:hover:not(.active) { color: #334155; }
+
+  .item-row { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; }
+
+  .preset-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; background: white; border: 1px solid #e2e8f0; border-radius: 9999px; font-size: 12px; font-weight: 600; color: #475569; cursor: pointer; transition: all .15s; }
+  .preset-pill:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+  .invoice-paper {
+    background: white; width: 210mm; min-height: 297mm;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 20px 40px -10px rgba(0,0,0,0.15);
+    margin: 0 auto;
+  }
+  .invoice-template { --inv-accent: #0d9488; --inv-accent-light: #ccfbf1; --inv-font: 'Plus Jakarta Sans'; font-family: var(--inv-font), sans-serif; color: #1e293b; }
+  .invoice-template .accent-bg { background: var(--inv-accent); }
+  .invoice-template .accent-text { color: var(--inv-accent); }
+  .invoice-template .accent-border { border-color: var(--inv-accent); }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; background: #0f172a; color: white; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); transform: translateY(80px); opacity: 0; transition: all .3s; z-index: 9999; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  .btn-primary { background: var(--accent); color: white; padding: 9px 16px; border-radius: 9px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: all .15s; border: none; cursor: pointer; }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 40%, transparent); }
+  .btn-secondary { background: white; color: #475569; padding: 9px 14px; border-radius: 9px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: all .15s; border: 1px solid #e2e8f0; cursor: pointer; }
+  .btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
+
+  @media print {
+    @page { margin: 0; size: A4; }
+    body * { visibility: hidden; }
+    #printArea, #printArea * { visibility: visible; }
+    #printArea { position: absolute; left: 0; top: 0; margin: 0; padding: 0; }
+    .invoice-paper { box-shadow: none; margin: 0; width: 210mm; min-height: 297mm; }
+    .no-print { display: none !important; }
+    body { background: white; }
+  }
+
+  @media (max-width: 1024px) {
+    .layout-split { flex-direction: column; }
+    .editor-panel { width: 100% !important; max-height: 50vh; }
+    .preview-panel { padding: 16px !important; }
+    .invoice-paper { width: 100%; min-height: auto; }
+  }
+
+  .signature-pad { border-bottom: 1.5px solid #94a3b8; min-height: 70px; display: flex; justify-content: center; padding-bottom: 4px; }
+  .floating-toolbar { position: sticky; top: 0; z-index: 20; }
+
+  /* Animations */
+  @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-slide { animation: slideUp .3s ease-out; }
+
+  /* Brand mark animation */
+  .brand-mark {
+    background: linear-gradient(135deg, #0d9488, #059669);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35);
+  }
+</style>
 </head>
+<body>
 
-<body class="bg-gray-100 min-h-screen py-6 px-3 md:px-4 relative">
-  <main class="max-w-5xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
-    <section class="bg-[#0f172a] p-7 md:p-10 text-center">
-      <h1 id="pageTitle" class="text-4xl md:text-7xl font-extrabold text-[#fbbf24] leading-tight tracking-wide">MATERI
-        WRITING</h1>
-      <div
-        class="mt-4 inline-block bg-[#fbbf24] text-[#0f172a] text-base md:text-2xl font-bold px-5 md:px-8 py-2 rounded-full shadow-md">
-        PERIODE <span id="periodText">-</span>
+<div id="toast" class="toast"><i class="fas fa-check-circle text-emerald-400"></i><span id="toastMsg">Tersimpan</span></div>
+
+<!-- Header -->
+<header class="no-print sticky top-0 z-30 bg-white/85 backdrop-blur-lg border-b border-slate-200">
+  <div class="px-5 py-3 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="brand-mark w-11 h-11 rounded-xl flex items-center justify-center text-white font-extrabold text-lg">RP</div>
+      <div>
+        <h1 class="font-extrabold text-slate-900 leading-tight">Ruang PTE</h1>
+        <p class="text-[11px] text-slate-500 font-medium tracking-wide">INVOICE STUDIO · Kursus PTE Premium</p>
       </div>
-      <p id="subtitleText" class="text-white mt-4 text-sm md:text-lg">Memuat jadwal...</p>
-    </section>
-
-    <section id="scheduleRoot" class="p-4 md:p-8 space-y-8" style="background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), url('/img/sketsa.webp') left/cover fixed no-repeat;">
-      <div class="p-6 text-center text-gray-500">Memuat jadwal...</div>
-    </section>
-
-    <section class="px-4 pb-8 md:px-8">
-      <div class="bg-[#0f172a] rounded-xl p-6 mt-2">
-        <div
-          class="text-center bg-[#fbbf24] px-4 py-1 rounded-md text-[#0f172a] font-bold text-sm max-w-max mx-auto mb-4">
-          CATATAN PENTING
-        </div>
-        <div id="notes" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-white text-sm"></div>
-      </div>
-    </section>
-
-    <footer class="bg-[#0f172a] text-white text-center py-4 text-sm">
-      <p class="font-bold tracking-widest text-gray-300">JANGAN LUPA LATIHAN, RAIH SKOR YANG TINGGI</p>
-      <p class="text-[#fbbf24] text-xs mt-1">PTE - Smart Practice - Better Score</p>
-    </footer>
-  </main>
-
-  <div class="fixed bottom-6 right-6 z-50">
-    <a href="/sistem-booking/index.html" class="bg-[#f59e0b] text-[#0f172a] hover:bg-[#c19218] text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300">BOOKING BANK REFERENCE <i class="fas fa-calendar-alt ml-[5px]"></i></a>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="loadSample()" class="btn-secondary hidden sm:inline-flex"><i class="fas fa-wand-magic-sparkles"></i><span>Contoh Data</span></button>
+      <button onclick="resetAll()" class="btn-secondary"><i class="fas fa-rotate-left"></i><span class="hidden sm:inline">Reset</span></button>
+      <button onclick="printInvoice()" class="btn-primary"><i class="fas fa-print"></i><span>Print / PDF</span></button>
+    </div>
   </div>
-    
-  <script>
+</header>
 
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyOOzlLbHnARf2hOJysUl1ZAYU01hbty1NjIs-MqBzw9HLWoopV8CEdfOj4IQ8MqsGjcg/exec';
+<!-- Main Layout -->
+<main class="no-print flex layout-split" style="height: calc(100vh - 67px);">
+  <!-- Editor Panel -->
+  <aside class="editor-panel w-[460px] flex-shrink-0 bg-white border-r border-slate-200 overflow-y-auto editor-scroll">
+    <div class="p-4 space-y-3">
 
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchScheduleData();
+      <!-- Quick Tabs -->
+      <div class="bg-slate-100 p-1 rounded-xl flex gap-1 overflow-x-auto">
+        <button class="tab-btn active" data-tab="all">Semua</button>
+        <button class="tab-btn" data-tab="bisnis">Bisnis</button>
+        <button class="tab-btn" data-tab="desain">Desain</button>
+        <button class="tab-btn" data-tab="invoice">Invoice</button>
+        <button class="tab-btn" data-tab="item">Item</button>
+        <button class="tab-btn" data-tab="bayar">Pembayaran</button>
+      </div>
+
+      <!-- SECTION: BISNIS -->
+      <div class="section-card" data-section="bisnis">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-store text-teal-600"></i>
+            <h3 class="font-bold text-slate-800 text-sm">Identitas Bisnis</h3>
+          </div>
+          <i class="fas fa-chevron-down chevron text-slate-400 text-xs"></i>
+        </div>
+        <div class="section-content space-y-3 pt-3">
+          <div>
+            <label class="form-label">Logo Bisnis</label>
+            <div id="logoDropzone" class="logo-dropzone" onclick="document.getElementById('logoInput').click()">
+              <input type="file" id="logoInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+              <div id="logoPreview" class="hidden">
+                <img id="logoImg" class="max-h-20 mx-auto mb-2" alt="logo">
+                <button onclick="event.stopPropagation(); removeLogo()" class="text-xs text-red-500 font-semibold hover:underline">Hapus Logo</button>
+              </div>
+              <div id="logoPlaceholder">
+                <i class="fas fa-cloud-arrow-up text-2xl text-slate-400 mb-2"></i>
+                <p class="text-xs text-slate-500 font-medium">Klik atau drag logo ke sini</p>
+                <p class="text-[10px] text-slate-400 mt-1">PNG / JPG, maks 2MB</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Nama Bisnis</label>
+            <input type="text" class="form-input" value="Ruang PTE" oninput="setField('business.name', this.value)">
+          </div>
+          <div>
+            <label class="form-label">Tagline</label>
+            <input type="text" class="form-input" value="Premium PTE Academic Preparation" oninput="setField('business.tagline', this.value)">
+          </div>
+          <div>
+            <label class="form-label">Alamat</label>
+            <textarea class="form-textarea" rows="2" oninput="setField('business.address', this.value)">Jl. Edukasi Menteng No. 27, Jakarta Pusat 10310, Indonesia</textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="form-label">Telepon</label>
+              <input type="text" class="form-input" value="+62 812 3456 7890" oninput="setField('business.phone', this.value)">
+            </div>
+            <div>
+              <label class="form-label">Email</label>
+              <input type="text" class="form-input" value="hello@ruangpte.id" oninput="setField('business.email', this.value)">
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Website / Instagram</label>
+            <input type="text" class="form-input" value="@ruangpte · ruangpte.id" oninput="setField('business.website', this.value)">
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: DESAIN -->
+      <div class="section-card" data-section="desain">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-palette text-pink-600"></i>
+            <h3 class="font-bold text-slate-800 text-sm">Desain & Tema</h3>
+          </div>
+          <i class="fas fa-chevron-down chevron text-slate-400 text-xs"></i>
+        </div>
+        <div class="section-content space-y-4 pt-3">
+          <div>
+            <label class="form-label">Template Layout</label>
+            <div class="grid grid-cols-3 gap-2" id="templatePicker">
+              <button data-tpl="modern" class="tpl-btn border-2 border-teal-500 bg-teal-50 rounded-lg p-3 text-center">
+                <div class="h-12 bg-gradient-to-r from-teal-500 to-emerald-500 rounded mb-2"></div>
+                <span class="text-[11px] font-bold text-slate-700">Modern</span>
+              </button>
+              <button data-tpl="classic" class="tpl-btn border-2 border-slate-200 rounded-lg p-3 text-center">
+                <div class="h-12 border-2 border-slate-700 rounded mb-2"></div>
+                <span class="text-[11px] font-bold text-slate-700">Classic</span>
+              </button>
+              <button data-tpl="minimal" class="tpl-btn border-2 border-slate-200 rounded-lg p-3 text-center">
+                <div class="h-12 bg-slate-100 rounded mb-2 flex items-center justify-center"><div class="w-8 h-1 bg-slate-700 rounded"></div></div>
+                <span class="text-[11px] font-bold text-slate-700">Minimal</span>
+              </button>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Warna Brand</label>
+            <div class="flex flex-wrap gap-2 items-center" id="colorPicker">
+              <div class="color-swatch active" style="background:#0d9488" data-color="#0d9488"></div>
+              <div class="color-swatch" style="background:#1e3a8a" data-color="#1e3a8a"></div>
+              <div class="color-swatch" style="background:#9f1239" data-color="#9f1239"></div>
+              <div class="color-swatch" style="background:#ea580c" data-color="#ea580c"></div>
+              <div class="color-swatch" style="background:#7c3aed" data-color="#7c3aed"></div>
+              <div class="color-swatch" style="background:#166534" data-color="#166534"></div>
+              <div class="color-swatch" style="background:#e11d48" data-color="#e11d48"></div>
+              <div class="color-swatch" style="background:#0f172a" data-color="#0f172a"></div>
+              <label class="cursor-pointer relative">
+                <input type="color" id="customColor" class="absolute opacity-0 w-8 h-8" value="#0d9488">
+                <div class="w-[30px] h-[30px] rounded-full border-2 border-white shadow flex items-center justify-center" style="background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);">
+                  <i class="fas fa-eye-dropper text-white text-[10px] drop-shadow"></i>
+                </div>
+              </label>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Font Family</label>
+            <select class="form-select" id="fontPicker">
+              <option value="Plus Jakarta Sans">Plus Jakarta Sans (Default)</option>
+              <option value="Inter">Inter</option>
+              <option value="Poppins">Poppins</option>
+              <option value="Space Grotesk">Space Grotesk</option>
+              <option value="Lora">Lora (Serif)</option>
+              <option value="Playfair Display">Playfair Display (Serif)</option>
+              <option value="DM Serif Display">DM Serif Display</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-slate-700">Tampilkan Logo</span>
+              <div class="toggle active" onclick="toggleField('appearance.showLogo', this)"></div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-slate-700">Tampilkan Tagline</span>
+              <div class="toggle active" onclick="toggleField('appearance.showTagline', this)"></div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-slate-700">Status Badge</span>
+              <div class="toggle active" onclick="toggleField('appearance.showStatus', this)"></div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-slate-700">QRIS Pembayaran</span>
+              <div class="toggle" onclick="toggleField('appearance.showQRIS', this)"></div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-slate-700">Tanda Tangan</span>
+              <div class="toggle active" onclick="toggleField('appearance.showSignature', this)"></div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-slate-700">Terms & Conditions</span>
+              <div class="toggle active" onclick="toggleField('appearance.showTerms', this)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: INVOICE -->
+      <div class="section-card" data-section="invoice">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-file-invoice text-blue-600"></i>
+            <h3 class="font-bold text-slate-800 text-sm">Detail Invoice</h3>
+          </div>
+          <i class="fas fa-chevron-down chevron text-slate-400 text-xs"></i>
+        </div>
+        <div class="section-content space-y-3 pt-3">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="form-label">Nomor Invoice</label>
+              <input type="text" class="form-input" value="INV-2024-001" oninput="setField('invoice.number', this.value)">
+            </div>
+            <div>
+              <label class="form-label">Status</label>
+              <select class="form-select" onchange="setField('invoice.status', this.value)">
+                <option value="unpaid">Belum Bayar</option>
+                <option value="partial">Sebagian</option>
+                <option value="paid">Lunas</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="form-label">Tanggal Terbit</label>
+              <input type="date" class="form-input" id="issueDate">
+            </div>
+            <div>
+              <label class="form-label">Jatuh Tempo</label>
+              <input type="date" class="form-input" id="dueDate">
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Mata Uang</label>
+            <select class="form-select" onchange="setField('invoice.currency', this.value)">
+              <option value="IDR">IDR · Rupiah</option>
+              <option value="USD">USD · Dollar</option>
+              <option value="SGD">SGD · Singapur</option>
+              <option value="AUD">AUD · Australia</option>
+            </select>
+          </div>
+          <hr class="border-slate-100">
+          <div>
+            <label class="form-label">Nama Siswa</label>
+            <input type="text" class="form-input" placeholder="cth: Ahmad Rizki Pratama" oninput="setField('client.name', this.value)">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="form-label">Email Siswa</label>
+              <input type="text" class="form-input" placeholder="email siswa" oninput="setField('client.email', this.value)">
+            </div>
+            <div>
+              <label class="form-label">Telepon</label>
+              <input type="text" class="form-input" placeholder="no hp" oninput="setField('client.phone', this.value)">
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Alamat Siswa</label>
+            <textarea class="form-textarea" rows="2" placeholder="alamat siswa" oninput="setField('client.address', this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: ITEM -->
+      <div class="section-card" data-section="item">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-list-check text-amber-600"></i>
+            <h3 class="font-bold text-slate-800 text-sm">Item Kursus</h3>
+          </div>
+          <i class="fas fa-chevron-down chevron text-slate-400 text-xs"></i>
+        </div>
+        <div class="section-content space-y-3 pt-3">
+          <div>
+            <label class="form-label">Tambah Cepat (Preset Program)</label>
+            <div class="flex flex-wrap gap-1.5" id="presetList">
+              <span class="preset-pill" onclick="addPresetItem('pte-academic')">PTE Academic Full</span>
+              <span class="preset-pill" onclick="addPresetItem('pte-speaking')">Speaking Class</span>
+              <span class="preset-pill" onclick="addPresetItem('pte-writing')">Writing Class</span>
+              <span class="preset-pill" onclick="addPresetItem('pte-core')">PTE Core</span>
+              <span class="preset-pill" onclick="addPresetItem('mock-test')">Mock Test</span>
+              <span class="preset-pill" onclick="addPresetItem('private')">1-on-1 Private</span>
+              <span class="preset-pill" onclick="addPresetItem('material')">Material Fee</span>
+            </div>
+          </div>
+          <div id="itemsList" class="space-y-2"></div>
+          <button onclick="addItem()" class="w-full py-2.5 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-teal-500 hover:text-teal-600 font-semibold text-sm transition-colors">
+            <i class="fas fa-plus mr-1"></i> Tambah Item Manual
+          </button>
+
+          <hr class="border-slate-100">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="form-label">Diskon</label>
+              <div class="flex gap-1">
+                <select class="form-select w-20" onchange="setField('discount.type', this.value)">
+                  <option value="percent">%</option>
+                  <option value="fixed">Fix</option>
+                </select>
+                <input type="number" class="form-input flex-1" value="0" min="0" oninput="setField('discount.value', parseFloat(this.value)||0)">
+              </div>
+            </div>
+            <div>
+              <label class="form-label">Pajak (PPN)</label>
+              <div class="flex gap-1">
+                <select class="form-select w-20" onchange="setField('tax.type', this.value)">
+                  <option value="percent">%</option>
+                  <option value="fixed">Fix</option>
+                </select>
+                <input type="number" class="form-input flex-1" value="0" min="0" oninput="setField('tax.value', parseFloat(this.value)||0)">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: PEMBAYARAN -->
+      <div class="section-card" data-section="bayar">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-credit-card text-indigo-600"></i>
+            <h3 class="font-bold text-slate-800 text-sm">Pembayaran & Catatan</h3>
+          </div>
+          <i class="fas fa-chevron-down chevron text-slate-400 text-xs"></i>
+        </div>
+        <div class="section-content space-y-3 pt-3">
+          <div>
+            <label class="form-label">Metode Pembayaran</label>
+            <select class="form-select" onchange="setField('payment.method', this.value)">
+              <option value="transfer">Transfer Bank</option>
+              <option value="qris">QRIS</option>
+              <option value="cash">Tunai</option>
+              <option value=" installment">Cicilan</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="form-label">Bank</label>
+              <input type="text" class="form-input" value="BCA" oninput="setField('payment.bank', this.value)">
+            </div>
+            <div>
+              <label class="form-label">No. Rekening</label>
+              <input type="text" class="form-input" value="1234567890" oninput="setField('payment.accountNumber', this.value)">
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Atas Nama</label>
+            <input type="text" class="form-input" value="Ruang PTE Education" oninput="setField('payment.accountName', this.value)">
+          </div>
+          <div id="qrisUploadWrap" class="hidden">
+            <label class="form-label">Upload Gambar QRIS</label>
+            <div class="logo-dropzone" onclick="document.getElementById('qrisInput').click()">
+              <input type="file" id="qrisInput" accept="image/*" class="hidden" onchange="handleQRISUpload(event)">
+              <div id="qrisPreview" class="hidden">
+                <img id="qrisImg" class="max-h-32 mx-auto mb-2" alt="qris">
+                <button onclick="event.stopPropagation(); removeQRIS()" class="text-xs text-red-500 font-semibold hover:underline">Hapus QRIS</button>
+              </div>
+              <div id="qrisPlaceholder">
+                <i class="fas fa-qrcode text-2xl text-slate-400 mb-2"></i>
+                <p class="text-xs text-slate-500 font-medium">Upload gambar QRIS</p>
+              </div>
+            </div>
+          </div>
+          <hr class="border-slate-100">
+          <div>
+            <label class="form-label">Catatan untuk Siswa</label>
+            <textarea class="form-textarea" rows="2" oninput="setField('notes', this.value)">Terima kasih telah memilih Ruang PTE. Mohon selesaikan pembayaran sebelum jadwal kursus dimulai.</textarea>
+          </div>
+          <div>
+            <label class="form-label">Terms & Conditions</label>
+            <textarea class="form-textarea" rows="3" oninput="setField('terms', this.value)">1. Pembayaran tidak dapat dikembalikan kecuali kelas dibatalkan oleh penyelenggara.
+2. Keterlambatan pembayaran lebih dari 7 hari akan menunda akses kelas.
+3. Sesi kursus yang sudah dijadwalkan tidak dapat di-reschedule lebih dari 2 kali.</textarea>
+          </div>
+          <hr class="border-slate-100">
+          <div>
+            <label class="form-label">Tanda Tangan (Nama PIC)</label>
+            <input type="text" class="form-input" value="Sarah Wijaya" oninput="setField('signature.name', this.value)">
+          </div>
+          <div>
+            <label class="form-label">Jabatan</label>
+            <input type="text" class="form-input" value="Academic Director" oninput="setField('signature.title', this.value)">
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center py-3 text-[11px] text-slate-400">
+        <i class="fas fa-shield-halved mr-1"></i> Data tersimpan lokal di browser Anda
+      </div>
+    </div>
+  </aside>
+
+  <!-- Preview Panel -->
+  <section class="preview-panel flex-1 overflow-auto preview-scroll bg-slate-200/60 p-8">
+    <div class="floating-toolbar no-print mb-4 flex items-center justify-between max-w-[210mm] mx-auto">
+      <div class="flex items-center gap-2 text-slate-600 text-sm font-medium">
+        <i class="fas fa-eye"></i> Preview Real-time · A4 (210 × 297 mm)
+      </div>
+      <div class="flex gap-2">
+        <button onclick="printInvoice()" class="btn-primary"><i class="fas fa-file-pdf"></i> Download PDF</button>
+      </div>
+    </div>
+    <div id="printArea">
+      <div id="invoicePreview" class="invoice-paper"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ===== STATE ===== */
+const defaultState = {
+  business: {
+    name: 'Ruang PTE',
+    tagline: 'Premium PTE Academic Preparation',
+    address: 'Jl. Edukasi Menteng No. 27, Jakarta Pusat 10310, Indonesia',
+    phone: '+62 812 3456 7890',
+    email: 'hello@ruangpte.id',
+    website: '@ruangpte · ruangpte.id',
+    logo: null
+  },
+  appearance: {
+    primaryColor: '#0d9488',
+    fontFamily: 'Plus Jakarta Sans',
+    template: 'modern',
+    showLogo: true,
+    showTagline: true,
+    showStatus: true,
+    showQRIS: false,
+    showSignature: true,
+    showTerms: true
+  },
+  invoice: {
+    number: 'INV-2024-001',
+    issueDate: new Date().toISOString().split('T')[0],
+    dueDate: new Date(Date.now() + 7*86400000).toISOString().split('T')[0],
+    currency: 'IDR',
+    status: 'unpaid'
+  },
+  client: { name: '', email: '', phone: '', address: '' },
+  items: [
+    { description: 'PTE Academic Full Course', detail: '20 sesi · 90 menit/sesi · 8 minggu', qty: 1, price: 3500000 },
+    { description: 'Mock Test Package', detail: '5 set full-length test + review', qty: 1, price: 750000 }
+  ],
+  discount: { type: 'percent', value: 10 },
+  tax: { type: 'percent', value: 0 },
+  payment: { method: 'transfer', bank: 'BCA', accountNumber: '1234567890', accountName: 'Ruang PTE Education', qris: null },
+  notes: 'Terima kasih telah memilih Ruang PTE. Mohon selesaikan pembayaran sebelum jadwal kursus dimulai.',
+  terms: '1. Pembayaran tidak dapat dikembalikan kecuali kelas dibatalkan oleh penyelenggara.\n2. Keterlambatan pembayaran lebih dari 7 hari akan menunda akses kelas.\n3. Sesi kursus yang sudah dijadwalkan tidak dapat di-reschedule lebih dari 2 kali.',
+  signature: { name: 'Sarah Wijaya', title: 'Academic Director', image: null }
+};
+
+let state = JSON.parse(JSON.stringify(defaultState));
+
+/* ===== PRESETS ===== */
+const presets = {
+  'pte-academic': { description: 'PTE Academic Full Course', detail: '20 sesi · 90 menit/sesi · 8 minggu', qty: 1, price: 3500000 },
+  'pte-speaking': { description: 'PTE Speaking Mastery', detail: '8 sesi fokus Read Aloud & Repeat Sentence', qty: 1, price: 1500000 },
+  'pte-writing': { description: 'PTE Writing intensive', detail: '8 sesi fokus Essay & Summarize Written Text', qty: 1, price: 1500000 },
+  'pte-core': { description: 'PTE Core Course', detail: '15 sesi untuk visa kerja Kanada', qty: 1, price: 3000000 },
+  'mock-test': { description: 'Mock Test Package', detail: '5 set full-length test + review', qty: 1, price: 750000 },
+  'private': { description: '1-on-1 Private Tutoring', detail: 'Sesi privat custom sesuai kebutuhan', qty: 4, price: 250000 },
+  'material': { description: 'Material & E-book Fee', detail: 'Akses portal + e-book + latihan', qty: 1, price: 250000 }
+};
+
+/* ===== UTILS ===== */
+function formatCurrency(amount, currency) {
+  const symbols = { IDR: 'Rp', USD: '$', SGD: 'S$', AUD: 'A$' };
+  const symbol = symbols[currency] || '';
+  const formatted = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount || 0);
+  return symbol + ' ' + formatted;
+}
+function formatDate(dateStr) {
+  if (!dateStr) return '-';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+function calculateTotals() {
+  const subtotal = state.items.reduce((s, it) => s + (it.qty * it.price), 0);
+  const discountAmt = state.discount.type === 'percent' ? subtotal * (state.discount.value / 100) : (state.discount.value || 0);
+  const taxBase = subtotal - discountAmt;
+  const taxAmt = state.tax.type === 'percent' ? taxBase * (state.tax.value / 100) : (state.tax.value || 0);
+  const total = subtotal - discountAmt + taxAmt;
+  return { subtotal, discountAmt, taxAmt, total };
+}
+
+/* ===== STATE OPS ===== */
+function setField(path, value) {
+  const keys = path.split('.');
+  let obj = state;
+  for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]];
+  obj[keys[keys.length - 1]] = value;
+  saveState(); renderPreview();
+}
+function toggleField(path, el) {
+  const keys = path.split('.');
+  let obj = state;
+  for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]];
+  const newVal = !obj[keys[keys.length - 1]];
+  obj[keys[keys.length - 1]] = newVal;
+  el.classList.toggle('active', newVal);
+  saveState(); renderPreview();
+  if (path === 'appearance.showQRIS') {
+    document.getElementById('qrisUploadWrap').classList.toggle('hidden', !newVal);
+  }
+}
+
+/* ===== ITEMS ===== */
+function addItem(item = null) {
+  state.items.push(item || { description: 'Item baru', detail: '', qty: 1, price: 0 });
+  saveState(); renderItems(); renderPreview();
+}
+function addPresetItem(key) {
+  addItem(JSON.parse(JSON.stringify(presets[key])));
+  showToast('Item ditambahkan');
+}
+function removeItem(idx) {
+  state.items.splice(idx, 1);
+  saveState(); renderItems(); renderPreview();
+}
+function updateItem(idx, field, value) {
+  if (field === 'qty' || field === 'price') value = parseFloat(value) || 0;
+  state.items[idx][field] = value;
+  saveState(); renderPreview();
+}
+
+/* ===== LOGO / QRIS UPLOAD ===== */
+function handleLogoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { showToast('Ukuran file maksimal 2MB', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    state.business.logo = ev.target.result;
+    document.getElementById('logoImg').src = ev.target.result;
+    document.getElementById('logoPreview').classList.remove('hidden');
+    document.getElementById('logoPlaceholder').classList.add('hidden');
+    saveState(); renderPreview();
+    showToast('Logo terupload');
+  };
+  reader.readAsDataURL(file);
+}
+function removeLogo() {
+  state.business.logo = null;
+  document.getElementById('logoPreview').classList.add('hidden');
+  document.getElementById('logoPlaceholder').classList.remove('hidden');
+  document.getElementById('logoInput').value = '';
+  saveState(); renderPreview();
+}
+function handleQRISUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    state.payment.qris = ev.target.result;
+    document.getElementById('qrisImg').src = ev.target.result;
+    document.getElementById('qrisPreview').classList.remove('hidden');
+    document.getElementById('qrisPlaceholder').classList.add('hidden');
+    saveState(); renderPreview();
+    showToast('QRIS terupload');
+  };
+  reader.readAsDataURL(file);
+}
+function removeQRIS() {
+  state.payment.qris = null;
+  document.getElementById('qrisPreview').classList.add('hidden');
+  document.getElementById('qrisPlaceholder').classList.remove('hidden');
+  document.getElementById('qrisInput').value = '';
+  saveState(); renderPreview();
+}
+
+/* ===== DRAG & DROP ===== */
+const dz = document.getElementById('logoDropzone');
+['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag-over'); }));
+['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag-over'); }));
+dz.addEventListener('drop', e => {
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const dt = new DataTransfer(); dt.items.add(file);
+    document.getElementById('logoInput').files = dt.files;
+    document.getElementById('logoInput').dispatchEvent(new Event('change'));
+  }
+});
+
+/* ===== RENDER EDITOR ITEMS ===== */
+function renderItems() {
+  const list = document.getElementById('itemsList');
+  list.innerHTML = state.items.map((it, idx) => `
+    <div class="item-row animate-slide">
+      <div class="flex justify-between items-start mb-2">
+        <span class="text-[11px] font-bold text-slate-500 uppercase">Item ${idx + 1}</span>
+        <button onclick="removeItem(${idx})" class="text-red-400 hover:text-red-600 text-xs"><i class="fas fa-trash"></i></button>
+      </div>
+      <input type="text" class="form-input mb-1.5" placeholder="Nama program" value="${escapeHtml(it.description)}" oninput="updateItem(${idx}, 'description', this.value)">
+      <input type="text" class="form-input mb-1.5" placeholder="Detail (opsional)" value="${escapeHtml(it.detail)}" oninput="updateItem(${idx}, 'detail', this.value)">
+      <div class="grid grid-cols-3 gap-1.5">
+        <div>
+          <label class="form-label">Qty</label>
+          <input type="number" class="form-input" min="1" value="${it.qty}" oninput="updateItem(${idx}, 'qty', this.value)">
+        </div>
+        <div class="col-span-2">
+          <label class="form-label">Harga</label>
+          <input type="number" class="form-input" min="0" value="${it.price}" oninput="updateItem(${idx}, 'price', this.value)">
+        </div>
+      </div>
+      <div class="text-right text-xs text-slate-500 mt-1.5">Subtotal: <span class="font-bold text-slate-800">${formatCurrency(it.qty * it.price, state.invoice.currency)}</span></div>
+    </div>
+  `).join('');
+}
+function escapeHtml(s) { return (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ===== RENDER PREVIEW ===== */
+function renderPreview() {
+  const t = state.appearance.template;
+  let html = '';
+  if (t === 'modern') html = renderModern();
+  else if (t === 'classic') html = renderClassic();
+  else html = renderMinimal();
+  const preview = document.getElementById('invoicePreview');
+  preview.innerHTML = html;
+  preview.style.setProperty('--inv-accent', state.appearance.primaryColor);
+  preview.style.setProperty('--inv-font', `'${state.appearance.fontFamily}', sans-serif`);
+}
+
+function statusBadge() {
+  const map = {
+    unpaid: { label: 'Belum Dibayar', bg: '#fee2e2', color: '#dc2626' },
+    partial: { label: 'Sebagian Dibayar', bg: '#fef3c7', color: '#d97706' },
+    paid: { label: 'Lunas', bg: '#dcfce7', color: '#16a34a' }
+  };
+  const s = map[state.invoice.status] || map.unpaid;
+  return `<span class="status-badge" style="background:${s.bg};color:${s.color}">${s.label}</span>`;
+}
+
+function renderItemsTable() {
+  const rows = state.items.map((it, idx) => `
+    <tr style="border-bottom: 1px solid #f1f5f9;">
+      <td style="padding: 12px 8px; vertical-align: top; color: #64748b; font-size: 12px; font-weight: 600;">${idx + 1}</td>
+      <td style="padding: 12px 8px; vertical-align: top;">
+        <div style="font-weight: 600; color: #0f172a; font-size: 13px;">${escapeHtml(it.description)}</div>
+        ${it.detail ? `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">${escapeHtml(it.detail)}</div>` : ''}
+      </td>
+      <td style="padding: 12px 8px; vertical-align: top; text-align: center; color: #475569; font-size: 13px;">${it.qty}</td>
+      <td style="padding: 12px 8px; vertical-align: top; text-align: right; color: #475569; font-size: 13px;">${formatCurrency(it.price, state.invoice.currency)}</td>
+      <td style="padding: 12px 8px; vertical-align: top; text-align: right; font-weight: 700; color: #0f172a; font-size: 13px;">${formatCurrency(it.qty * it.price, state.invoice.currency)}</td>
+    </tr>
+  `).join('');
+  return `
+    <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+      <thead>
+        <tr style="background: var(--inv-accent); color: white;">
+          <th style="padding: 10px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; width: 30px;">#</th>
+          <th style="padding: 10px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Deskripsi</th>
+          <th style="padding: 10px 8px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; width: 50px;">Qty</th>
+          <th style="padding: 10px 8px; text-align: right; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; width: 110px;">Harga</th>
+          <th style="padding: 10px 8px; text-align: right; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; width: 130px;">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function renderTotals() {
+  const t = calculateTotals();
+  const cur = state.invoice.currency;
+  return `
+    <div style="margin-left: auto; width: 280px; margin-top: 16px;">
+      <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: #475569;">
+        <span>Subtotal</span><span style="font-weight: 600; color: #0f172a;">${formatCurrency(t.subtotal, cur)}</span>
+      </div>
+      ${t.discountAmt > 0 ? `
+      <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: #475569;">
+        <span>Diskon ${state.discount.type === 'percent' ? `(${state.discount.value}%)` : ''}</span>
+        <span style="font-weight: 600; color: #dc2626;">- ${formatCurrency(t.discountAmt, cur)}</span>
+      </div>` : ''}
+      ${t.taxAmt > 0 ? `
+      <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: #475569;">
+        <span>Pajak ${state.tax.type === 'percent' ? `(${state.tax.value}%)` : ''}</span>
+        <span style="font-weight: 600; color: #0f172a;">+ ${formatCurrency(t.taxAmt, cur)}</span>
+      </div>` : ''}
+      <div style="display: flex; justify-content: space-between; padding: 14px 12px; margin-top: 8px; background: var(--inv-accent); color: white; border-radius: 8px;">
+        <span style="font-weight: 700; font-size: 14px;">TOTAL</span>
+        <span style="font-weight: 800; font-size: 16px;">${formatCurrency(t.total, cur)}</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderBusinessBlock(align = 'left') {
+  const b = state.business;
+  return `
+    <div style="text-align: ${align};">
+      ${state.appearance.showLogo && b.logo ? `<img src="${b.logo}" style="max-height: 60px; max-width: 180px; margin-bottom: 8px; object-fit: contain;" alt="logo">` : ''}
+      <div style="font-size: 18px; font-weight: 800; color: var(--inv-accent); letter-spacing: -0.02em;">${escapeHtml(b.name)}</div>
+      ${state.appearance.showTagline && b.tagline ? `<div style="font-size: 11px; color: #64748b; margin-top: 2px;">${escapeHtml(b.tagline)}</div>` : ''}
+      <div style="font-size: 11px; color: #64748b; margin-top: 8px; line-height: 1.5;">
+        ${escapeHtml(b.address)}<br>
+        ${b.phone ? `${escapeHtml(b.phone)} · ` : ''}${escapeHtml(b.email)}<br>
+        ${escapeHtml(b.website)}
+      </div>
+    </div>
+  `;
+}
+
+function renderPaymentInfo() {
+  if (state.payment.method === 'cash') {
+    return `<div style="font-size: 12px; color: #475569;">Pembayaran tunai di lokasi Ruang PTE. Mohon bawa invoice ini saat pembayaran.</div>`;
+  }
+  let qrisBlock = '';
+  if (state.appearance.showQRIS && state.payment.qris) {
+    qrisBlock = `
+      <div style="margin-top: 12px; text-align: center;">
+        <img src="${state.payment.qris}" style="width: 130px; height: 130px; object-fit: contain; border: 1px solid #e2e8f0; border-radius: 8px; padding: 4px;">
+        <div style="font-size: 10px; color: #64748b; margin-top: 4px;">Scan untuk bayar via QRIS</div>
+      </div>
+    `;
+  }
+  return `
+    <div style="font-size: 12px; color: #475569; line-height: 1.7;">
+      <div style="font-weight: 700; color: #0f172a; margin-bottom: 4px;">Transfer Bank</div>
+      <div>${escapeHtml(state.payment.bank)} · ${escapeHtml(state.payment.accountNumber)}</div>
+      <div>a.n. ${escapeHtml(state.payment.accountName)}</div>
+    </div>
+    ${qrisBlock}
+  `;
+}
+
+function renderFooterBlock() {
+  let sigBlock = '';
+  if (state.appearance.showSignature) {
+    sigBlock = `
+      <div style="text-align: center; min-width: 180px;">
+        <div style="font-size: 12px; color: #475569; margin-bottom: 36px;">Hormat kami,</div>
+        <div style="border-top: 1.5px solid #475569; padding-top: 8px; font-weight: 700; color: #0f172a; font-size: 13px;">${escapeHtml(state.signature.name)}</div>
+        <div style="font-size: 11px; color: #64748b;">${escapeHtml(state.signature.title)}</div>
+      </div>
+    `;
+  }
+  let termsBlock = '';
+  if (state.appearance.showTerms && state.terms) {
+    termsBlock = `
+      <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+        <div style="font-size: 11px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Syarat & Ketentuan</div>
+        <div style="font-size: 11px; color: #64748b; line-height: 1.7; white-space: pre-line;">${escapeHtml(state.terms)}</div>
+      </div>
+    `;
+  }
+  return { sigBlock, termsBlock };
+}
+
+/* ===== TEMPLATE: MODERN ===== */
+function renderModern() {
+  const totals = calculateTotals();
+  const cur = state.invoice.currency;
+  const { sigBlock, termsBlock } = renderFooterBlock();
+  return `
+    <div class="invoice-template" style="padding: 0; min-height: 297mm;">
+      <div style="height: 10px; background: var(--inv-accent);"></div>
+      <div style="padding: 36px 40px;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px;">
+          ${renderBusinessBlock('left')}
+          <div style="text-align: right;">
+            <div style="font-size: 32px; font-weight: 800; color: #0f172a; letter-spacing: -0.03em; line-height: 1;">INVOICE</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 6px;">${escapeHtml(state.invoice.number)}</div>
+            ${state.appearance.showStatus ? `<div style="margin-top: 10px;">${statusBadge()}</div>` : ''}
+          </div>
+        </div>
+
+        <!-- Meta + Client -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+          <div style="background: #f8fafc; padding: 16px; border-radius: 10px; border-left: 3px solid var(--inv-accent);">
+            <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ditagihkan Kepada</div>
+            <div style="font-weight: 700; color: #0f172a; font-size: 14px;">${escapeHtml(state.client.name || 'Nama Siswa')}</div>
+            ${state.client.address ? `<div style="font-size: 11px; color: #64748b; margin-top: 4px; line-height: 1.5;">${escapeHtml(state.client.address)}</div>` : ''}
+            ${state.client.email ? `<div style="font-size: 11px; color: #64748b; margin-top: 4px;">${escapeHtml(state.client.email)}</div>` : ''}
+            ${state.client.phone ? `<div style="font-size: 11px; color: #64748b;">${escapeHtml(state.client.phone)}</div>` : ''}
+          </div>
+          <div style="background: #f8fafc; padding: 16px; border-radius: 10px; border-left: 3px solid var(--inv-accent);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-size: 11px; color: #64748b;">Tanggal Terbit</span>
+              <span style="font-size: 11px; font-weight: 600; color: #0f172a;">${formatDate(state.invoice.issueDate)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-size: 11px; color: #64748b;">Jatuh Tempo</span>
+              <span style="font-size: 11px; font-weight: 600; color: #dc2626;">${formatDate(state.invoice.dueDate)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-size: 11px; color: #64748b;">Mata Uang</span>
+              <span style="font-size: 11px; font-weight: 600; color: #0f172a;">${state.invoice.currency}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items -->
+        ${renderItemsTable()}
+        ${renderTotals()}
+
+        <!-- Payment + Notes + Signature -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px;">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Info Pembayaran</div>
+            ${renderPaymentInfo()}
+            ${state.notes ? `
+              <div style="margin-top: 16px;">
+                <div style="font-size: 11px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Catatan</div>
+                <div style="font-size: 11px; color: #64748b; line-height: 1.6;">${escapeHtml(state.notes)}</div>
+              </div>` : ''}
+          </div>
+          <div style="display: flex; justify-content: flex-end;">
+            ${sigBlock}
+          </div>
+        </div>
+
+        ${termsBlock}
+
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 10px; color: #94a3b8;">
+          Invoice ini diterbitkan secara elektronik oleh ${escapeHtml(state.business.name)} · ${escapeHtml(state.business.website)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ===== TEMPLATE: CLASSIC ===== */
+function renderClassic() {
+  const { sigBlock, termsBlock } = renderFooterBlock();
+  return `
+    <div class="invoice-template" style="padding: 0; min-height: 297mm;">
+      <div style="border: 3px double var(--inv-accent); margin: 16px; height: calc(297mm - 32px);">
+        <div style="padding: 30px 36px;">
+          <!-- Header -->
+          <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid var(--inv-accent);">
+            ${state.appearance.showLogo && state.business.logo ? `<img src="${state.business.logo}" style="max-height: 70px; max-width: 200px; margin: 0 auto 10px; object-fit: contain; display: block;" alt="logo">` : ''}
+            <div style="font-size: 24px; font-weight: 800; color: var(--inv-accent); font-family: 'Playfair Display', serif; letter-spacing: 0.02em;">${escapeHtml(state.business.name)}</div>
+            ${state.appearance.showTagline && state.business.tagline ? `<div style="font-size: 11px; color: #64748b; font-style: italic; margin-top: 2px;">${escapeHtml(state.business.tagline)}</div>` : ''}
+            <div style="font-size: 11px; color: #64748b; margin-top: 8px; line-height: 1.6;">${escapeHtml(state.business.address)} · ${escapeHtml(state.business.phone)} · ${escapeHtml(state.business.email)}</div>
+          </div>
+
+          <!-- Invoice Title -->
+          <div style="text-align: center; margin: 24px 0;">
+            <div style="font-size: 36px; font-weight: 700; color: #0f172a; font-family: 'Playfair Display', serif; letter-spacing: 0.05em;">INVOICE</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">No: ${escapeHtml(state.invoice.number)}</div>
+            ${state.appearance.showStatus ? `<div style="margin-top: 8px;">${statusBadge()}</div>` : ''}
+          </div>
+
+          <!-- Meta -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; font-size: 12px;">
+            <div>
+              <div style="margin-bottom: 4px;"><span style="color: #64748b;">Tanggal:</span> <span style="font-weight: 600;">${formatDate(state.invoice.issueDate)}</span></div>
+              <div><span style="color: #64748b;">Jatuh Tempo:</span> <span style="font-weight: 600;">${formatDate(state.invoice.dueDate)}</span></div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Ditagihkan Kepada</div>
+              <div style="font-weight: 700; color: #0f172a; margin-top: 2px;">${escapeHtml(state.client.name || 'Nama Siswa')}</div>
+              ${state.client.address ? `<div style="color: #64748b; font-size: 11px;">${escapeHtml(state.client.address)}</div>` : ''}
+              ${state.client.email ? `<div style="color: #64748b; font-size: 11px;">${escapeHtml(state.client.email)}</div>` : ''}
+              ${state.client.phone ? `<div style="color: #64748b; font-size: 11px;">${escapeHtml(state.client.phone)}</div>` : ''}
+            </div>
+          </div>
+
+          <!-- Items -->
+          ${renderItemsTable()}
+          ${renderTotals()}
+
+          <!-- Bottom -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px;">
+            <div>
+              <div style="font-size: 11px; font-weight: 700; color: #0f172a; text-transform: uppercase; margin-bottom: 6px;">Pembayaran</div>
+              ${renderPaymentInfo()}
+            </div>
+            <div style="display: flex; justify-content: flex-end;">${sigBlock}</div>
+          </div>
+
+          ${state.notes ? `<div style="margin-top: 20px; font-size: 11px; color: #64748b; line-height: 1.6;"><strong>Catatan:</strong> ${escapeHtml(state.notes)}</div>` : ''}
+          ${termsBlock}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ===== TEMPLATE: MINIMAL ===== */
+function renderMinimal() {
+  const { sigBlock, termsBlock } = renderFooterBlock();
+  return `
+    <div class="invoice-template" style="padding: 60px 70px; min-height: 297mm;">
+      <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 60px;">
+        <div>
+          ${state.appearance.showLogo && state.business.logo ? `<img src="${state.business.logo}" style="max-height: 50px; max-width: 160px; margin-bottom: 12px; object-fit: contain;" alt="logo">` : ''}
+          <div style="font-size: 16px; font-weight: 700; color: #0f172a; letter-spacing: -0.01em;">${escapeHtml(state.business.name)}</div>
+          ${state.appearance.showTagline && state.business.tagline ? `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">${escapeHtml(state.business.tagline)}</div>` : ''}
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em;">Invoice</div>
+          <div style="font-size: 13px; font-weight: 600; color: #0f172a; margin-top: 2px;">${escapeHtml(state.invoice.number)}</div>
+          ${state.appearance.showStatus ? `<div style="margin-top: 8px;">${statusBadge()}</div>` : ''}
+        </div>
+      </div>
+
+      <!-- Client + Meta -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px;">
+        <div>
+          <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Ditagihkan Kepada</div>
+          <div style="font-size: 14px; font-weight: 600; color: #0f172a;">${escapeHtml(state.client.name || 'Nama Siswa')}</div>
+          ${state.client.address ? `<div style="font-size: 12px; color: #64748b; margin-top: 4px; line-height: 1.5;">${escapeHtml(state.client.address)}</div>` : ''}
+          ${state.client.email ? `<div style="font-size: 12px; color: #64748b;">${escapeHtml(state.client.email)}</div>` : ''}
+          ${state.client.phone ? `<div style="font-size: 12px; color: #64748b;">${escapeHtml(state.client.phone)}</div>` : ''}
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Detail</div>
+          <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Terbit: <span style="color: #0f172a; font-weight: 500;">${formatDate(state.invoice.issueDate)}</span></div>
+          <div style="font-size: 12px; color: #64748b;">Jatuh Tempo: <span style="color: #0f172a; font-weight: 500;">${formatDate(state.invoice.dueDate)}</span></div>
+        </div>
+      </div>
+
+      <!-- Items -->
+      <div style="border-top: 1.5px solid #0f172a; padding-top: 12px;">
+        <div style="display: grid; grid-template-columns: 30px 1fr 50px 120px 130px; gap: 8px; padding: 8px 0; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em;">
+          <div>#</div><div>Deskripsi</div><div style="text-align: center;">Qty</div><div style="text-align: right;">Harga</div><div style="text-align: right;">Subtotal</div>
+        </div>
+        ${state.items.map((it, idx) => `
+          <div style="display: grid; grid-template-columns: 30px 1fr 50px 120px 130px; gap: 8px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; align-items: start;">
+            <div style="color: #94a3b8;">${idx + 1}</div>
+            <div>
+              <div style="font-weight: 600; color: #0f172a;">${escapeHtml(it.description)}</div>
+              ${it.detail ? `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">${escapeHtml(it.detail)}</div>` : ''}
+            </div>
+            <div style="text-align: center; color: #475569;">${it.qty}</div>
+            <div style="text-align: right; color: #475569;">${formatCurrency(it.price, state.invoice.currency)}</div>
+            <div style="text-align: right; font-weight: 600; color: #0f172a;">${formatCurrency(it.qty * it.price, state.invoice.currency)}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- Totals -->
+      ${renderTotals()}
+
+      <!-- Bottom -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 50px;">
+        <div>
+          <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;">Pembayaran</div>
+          ${renderPaymentInfo()}
+        </div>
+        <div style="display: flex; justify-content: flex-end;">${sigBlock}</div>
+      </div>
+
+      ${state.notes ? `<div style="margin-top: 32px; font-size: 11px; color: #64748b; line-height: 1.6;">${escapeHtml(state.notes)}</div>` : ''}
+      ${termsBlock}
+    </div>
+  `;
+}
+
+/* ===== UI HELPERS ===== */
+function toggleSection(header) {
+  header.parentElement.classList.toggle('section-collapsed');
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.querySelector('i').className = type === 'success' ? 'fas fa-check-circle text-emerald-400' : 'fas fa-exclamation-circle text-amber-400';
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ===== ACTIONS ===== */
+function printInvoice() {
+  window.print();
+}
+
+function resetAll() {
+  if (!confirm('Reset semua data invoice ke pengaturan awal? Data tersimpan akan hilang.')) return;
+  state = JSON.parse(JSON.stringify(defaultState));
+  saveState();
+  location.reload();
+}
+
+function loadSample() {
+  state.client = {
+    name: 'Ahmad Rizki Pratama',
+    email: 'ahmad.rizki@email.com',
+    phone: '+62 813 9876 5432',
+    address: 'Jl. Casablanca No. 88, Karet Setiabudi, Jakarta Selatan 12940'
+  };
+  state.items = [
+    { description: 'PTE Academic Full Course', detail: '20 sesi · 90 menit/sesi · 8 minggu · Kelas malam', qty: 1, price: 3500000 },
+    { description: 'Mock Test Package', detail: '5 set full-length test + 1-on-1 review', qty: 1, price: 750000 },
+    { description: '1-on-1 Private Tutoring', detail: 'Sesi privat Speaking fokus pronunciation', qty: 4, price: 250000 }
+  ];
+  state.discount = { type: 'percent', value: 10 };
+  state.invoice.number = 'INV-2024-' + Math.floor(Math.random() * 900 + 100);
+  saveState();
+  syncEditorFromState();
+  renderItems();
+  renderPreview();
+  showToast('Data contoh dimuat');
+}
+
+function syncEditorFromState() {
+  // Sync all inputs from state
+  document.querySelectorAll('input[oninput^="setField"]').forEach(el => {
+    const path = el.getAttribute('oninput').match(/'([^']+)'/)[1];
+    const keys = path.split('.');
+    let obj = state;
+    for (let k of keys) obj = obj[k];
+    if (typeof obj !== 'undefined') el.value = obj;
+  });
+  document.querySelectorAll('textarea[oninput^="setField"]').forEach(el => {
+    const path = el.getAttribute('oninput').match(/'([^']+)'/)[1];
+    const keys = path.split('.');
+    let obj = state;
+    for (let k of keys) obj = obj[k];
+    if (typeof obj !== 'undefined') el.value = obj;
+  });
+  document.getElementById('issueDate').value = state.invoice.issueDate;
+  document.getElementById('dueDate').value = state.invoice.dueDate;
+  document.getElementById('fontPicker').value = state.appearance.fontFamily;
+  // Sync color swatches
+  document.querySelectorAll('.color-swatch').forEach(s => {
+    s.classList.toggle('active', s.dataset.color === state.appearance.primaryColor);
+  });
+  // Sync template picker
+  document.querySelectorAll('.tpl-btn').forEach(b => {
+    const isActive = b.dataset.tpl === state.appearance.template;
+    b.classList.toggle('border-teal-500', isActive);
+    b.classList.toggle('bg-teal-50', isActive);
+    b.classList.toggle('border-slate-200', !isActive);
+  });
+  // Sync toggles
+  const toggles = document.querySelectorAll('.toggle');
+  toggles[0]?.classList.toggle('active', state.appearance.showLogo);
+  toggles[1]?.classList.toggle('active', state.appearance.showTagline);
+  toggles[2]?.classList.toggle('active', state.appearance.showStatus);
+  toggles[3]?.classList.toggle('active', state.appearance.showQRIS);
+  toggles[4]?.classList.toggle('active', state.appearance.showSignature);
+  toggles[5]?.classList.toggle('active', state.appearance.showTerms);
+  document.getElementById('qrisUploadWrap').classList.toggle('hidden', !state.appearance.showQRIS);
+}
+
+/* ===== STORAGE ===== */
+function saveState() {
+  try { localStorage.setItem('ruangpte_invoice', JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try {
+    const saved = localStorage.getItem('ruangpte_invoice');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = { ...defaultState, ...parsed };
+      // Deep merge for nested objects
+      ['business','appearance','invoice','client','discount','tax','payment','signature'].forEach(k => {
+        state[k] = { ...defaultState[k], ...parsed[k] };
+      });
+    }
+  } catch(e) {}
+}
+
+/* ===== EVENT BINDINGS ===== */
+document.getElementById('issueDate').addEventListener('change', e => setField('invoice.issueDate', e.target.value));
+document.getElementById('dueDate').addEventListener('change', e => setField('invoice.dueDate', e.target.value));
+document.getElementById('fontPicker').addEventListener('change', e => setField('appearance.fontFamily', e.target.value));
+document.getElementById('customColor').addEventListener('input', e => {
+  setField('appearance.primaryColor', e.target.value);
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+});
+
+document.querySelectorAll('.color-swatch').forEach(s => {
+  s.addEventListener('click', () => {
+    document.querySelectorAll('.color-swatch').forEach(x => x.classList.remove('active'));
+    s.classList.add('active');
+    setField('appearance.primaryColor', s.dataset.color);
+    document.getElementById('customColor').value = s.dataset.color;
+    document.documentElement.style.setProperty('--accent', s.dataset.color);
+  });
+});
+
+document.querySelectorAll('.tpl-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tpl-btn').forEach(x => {
+      x.classList.remove('border-teal-500', 'bg-teal-50');
+      x.classList.add('border-slate-200');
     });
+    b.classList.add('border-teal-500', 'bg-teal-50');
+    b.classList.remove('border-slate-200');
+    setField('appearance.template', b.dataset.tpl);
+  });
+});
 
-    async function fetchScheduleData() {
-      try {
-        const response = await fetch(`${WEB_APP_URL}?format=json`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        renderSchedule(data);
-      } catch (error) {
-        showError(error);
-      }
-    }
+document.querySelectorAll('.tab-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    const tab = b.dataset.tab;
+    document.querySelectorAll('.section-card').forEach(s => {
+      if (tab === 'all') { s.style.display = ''; }
+      else { s.style.display = s.dataset.section === tab ? '' : 'none'; }
+    });
+  });
+});
 
-    function renderSchedule(data) {
-      const settings = data.settings || {};
-      document.getElementById('pageTitle').textContent = settings.Judul || 'MATERI WRITING';
-      document.getElementById('periodText').textContent = settings.Periode || '';
-      document.getElementById('subtitleText').textContent = settings.Subjudul || '';
-      document.getElementById('notes').innerHTML = [
-        settings['Catatan 1'],
-        settings['Catatan 2'],
-        settings['Catatan 3'],
-      ].filter(Boolean).map(note => '<p>' + esc(note) + '</p>').join('');
-
-      const holidays = (settings['Hari Libur'] || '').split(',').map(d => d.trim().toLowerCase()).filter(Boolean);
-
-      const root = document.getElementById('scheduleRoot');
-      root.innerHTML = data.days.map(day => {
-        const isHoliday = holidays.includes(day.toLowerCase());
-        return renderDay(day, data.grouped[day], isHoliday);
-      }).join('');
-    }
-
-    function renderDay(day, groups, isHoliday) {
-      if (isHoliday) {
-        return '<section class="rounded-xl border border-red-200 overflow-hidden shadow-sm bg-gradient-to-r from-red-50 to-orange-50">' +
-          '<div class="bg-red-600 text-white px-4 py-3 font-extrabold text-xl flex items-center justify-between">' +
-            '<span>' + esc(day.toUpperCase()) + '</span>' +
-            '<span class="bg-white text-red-600 text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm">Libur</span>' +
-          '</div>' +
-          '<div class="p-8 text-center flex flex-col items-center justify-center space-y-3">' +
-            '<div class="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-3xl shadow-inner animate-pulse">' +
-              '<i class="fa-solid fa-mug-hot"></i>' +
-            '</div>' +
-            '<h3 class="text-xl font-bold text-red-800">Hari ini tidak ada kelas</h3>' +
-            '<p class="text-red-600 text-sm max-w-md">Kelas diliburkan untuk hari ini. Silakan gunakan waktu untuk istirahat atau latihan mandiri. Tetap semangat!</p>' +
-          '</div>' +
-          '</section>';
-      }
-
-      return '<section class="rounded-xl border border-gray-200 overflow-hidden">' +
-        '<div class="bg-[#0f172a] text-[#fbbf24] px-4 py-3 font-extrabold text-xl">' + esc(day.toUpperCase()) + '</div>' +
-        '<div class="p-4 md:p-5 space-y-6 bg-white bg-opacity-60">' +
-        renderTable('JADWAL KELAS OFFLINE', groups.Offline, 'offline') +
-        renderTable('JADWAL KELAS ONLINE', groups.Online, 'online') +
-        '</div>' +
-        '</section>';
-    }
-
-    function renderTable(title, rows, type) {
-      const headers = type === 'offline'
-        ? ['WAKTU', 'SESI URUT', 'PENGAJAR', 'TEMPAT', 'FOKUS']
-        : ['WAKTU', 'SESI URUT', 'PENGAJAR', 'PLATFORM', 'FOKUS'];
-
-      return '<div>' +
-        '<h2 class="text-lg md:text-2xl font-bold text-[#0f172a] mb-3">' + esc(title) + '</h2>' +
-        '<div class="overflow-x-auto rounded-lg border border-gray-300 shadow-sm">' +
-        '<table class="w-full text-left text-sm md:text-base">' +
-        '<thead class="bg-[#0f172a] text-white"><tr>' +
-        headers.map(header => '<th class="p-3 ' + (header === 'WAKTU' || header === 'SESI' ? 'text-center' : '') + '">' + header + '</th>').join('') +
-        '</tr></thead>' +
-        '<tbody class="divide-y divide-gray-200">' +
-        (rows.length ? rows.map(row => renderRow(row, type)).join('') : emptyRow(headers.length)) +
-        '</tbody>' +
-        '</table>' +
-        '</div>' +
-        '</div>';
-    }
-
-    function renderRow(row, type) {
-      if (type === 'offline') {
-        return '<tr class="hover:bg-gray-300">' +
-          '<td class="p-3 text-center whitespace-nowrap">' + esc(row.Waktu) + '</td>' +
-          '<td class="p-3 text-center whitespace-nowrap">' + sessionBadge(row.Sesi) + '</td>' +
-          '<td class="p-3 whitespace-nowrap">' + esc(row.Pengajar) + '</td>' +
-          '<td class="p-3 whitespace-nowrap">' + platformText(row.Platform) + '</td>' +
-          '<td class="p-3">' + labelBadge(row.Label) + esc(row.Fokus) + '</td>' +
-          '</tr>';
-      }
-
-      return '<tr class="hover:bg-gray-300">' +
-        '<td class="p-3 text-center whitespace-nowrap">' + esc(row.Waktu) + '</td>' +
-        '<td class="p-3 text-center whitespace-nowrap">' + sessionBadge(row.Sesi) + '</td>' +
-        '<td class="p-3 whitespace-nowrap">' + esc(row.Pengajar) + '</td>' +
-        '<td class="p-3 whitespace-nowrap">' + platformText(row.Platform) + '</td>' +
-        '<td class="p-3">' + labelBadge(row.Label) + esc(row.Fokus) + '</td>' +
-        '</tr>';
-    }
-
-    function sessionBadge(value) {
-      if (!value) return '';
-      return '<span class="bg-[#0f172a] text-white px-3 py-1 rounded-md text-xs font-bold">' + esc(value) + '</span>';
-    }
-
-    function labelBadge(value) {
-      if (!value) return '';
-      const text = value.toUpperCase();
-      const classes = text.includes('LAMA')
-        ? 'bg-[#fbbf24] text-[#0f172a]'
-        : text.includes('SEMUA')
-          ? 'bg-gray-500 text-white'
-          : 'bg-[#0f172a] text-white';
-
-      return '<span class="inline-block ' + classes + ' px-2 py-0.5 rounded text-[10px] font-bold mb-1">' + esc(value) + '</span><br>';
-    }
-
-    function platformText(value) {
-      if (!value) return '';
-
-      const discordIcon = '<i class="fa-brands fa-discord text-[#5865F2] mr-2"></i>';
-      const meetIcon = '<i class="fa-solid fa-video text-[#feda1e] mr-2"></i>';
-      const officeIcon = '<i class="fa-solid fa-building text-gray-600 mr-2"></i>';
-      const cafeIcon = '<i class="fa-solid fa-mug-hot text-[#6F4E37] mr-2"></i>';
-      const rumahIcon = '<i class="fa-solid fa-house-chimney-user text-gray-600 mr-2"></i>';
-
-      const valLower = value.toLowerCase();
-
-      const icon = valLower.includes('discord') ? discordIcon
-        : valLower.includes('meet') ? meetIcon
-          : valLower.includes('office') ? officeIcon
-            : valLower.includes('cafe') ? cafeIcon
-              : valLower.includes('rumah') ? rumahIcon
-                : '';
-
-      return `${icon}${esc(value)}`;
-    }
-
-    function emptyRow(colspan) {
-      return '<tr><td colspan="' + colspan + '" class="p-4 text-center text-gray-500">Belum ada jadwal.</td></tr>';
-    }
-
-    function showError(error) {
-      document.getElementById('scheduleRoot').innerHTML =
-        '<div class="p-6 text-center text-red-600">Gagal memuat jadwal: ' + esc(error.message || error) + '</div>';
-    }
-
-    function esc(value) {
-      return String(value || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-  </script>
+/* ===== INIT ===== */
+function init() {
+  loadState();
+  syncEditorFromState();
+  renderItems();
+  renderPreview();
+  document.documentElement.style.setProperty('--accent', state.appearance.primaryColor);
+}
+init();
+</script>
 </body>
-
 </html>
